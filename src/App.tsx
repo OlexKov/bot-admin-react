@@ -1,33 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Route, Routes } from "react-router-dom"
+import Layout from "./components/layout"
+import Error from './components/pages/error-page'
+import { Login } from "./components/pages/login"
 import './App.css'
+import { SetupInterceptors } from "./interceptors"
+import { Users } from "./components/pages/users"
+
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  SetupInterceptors();
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Users />} />
+          <Route path="/login" element={<Login />} />
+          {/* <Route path="/categories/create" element={
+            <AdminProtectedRoute children={<CategoryCreation />} />} />
+          <Route path="/categories" element={
+            <AdminProtectedRoute children={<CategoryTable />} />} />
+          <Route path="/products" element={
+            <AdminProtectedRoute children={<ProductTable />} />} />
+          <Route path="/products/create" element={
+            <AdminProtectedRoute children={<ProductCreate />} />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          
+          <Route path="/registration" element={<Registration />} /> */}
+          <Route path="*" element={
+            <Error
+              status="404"
+              title="404"
+              subTitle="Вибачте, сторінкт на яку ви намагаєтесь перейти не існує."
+            />} />
+          <Route path="forbiden" element={
+            <Error
+              status="403"
+              title="403"
+              subTitle="В доступі відмовлено.Ви не маєте дозволу для доступу до цієї сторінки."
+            />} />
+        </Route>
+      </Routes>
     </>
   )
 }
