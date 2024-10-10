@@ -56,17 +56,24 @@ export const Users: React.FC = () => {
             title: `Ім'я`,
             key: 'name',
             dataIndex: 'firstName',
-
+            render: (element: string) => element && element !== '' ? element : "------"
         },
         {
             title: 'Прізвище',
             dataIndex: 'lastName',
             key: 'lastName',
+            render: (element: string) => element && element !== '' ? element : "------"
         },
         {
             title: 'Телефон',
             key: 'phoneNumbere',
             dataIndex: 'phoneNumber',
+        },
+        {
+            title: 'Професія',
+            dataIndex: 'professionName',
+            key: 'professionName',
+            render: (element: string) => element && element !== '' ? element : "------"
         },
         {
             title: 'Чат ID',
