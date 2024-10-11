@@ -22,18 +22,18 @@ export const Login: React.FC = () => {
     }
     return (
         <>
-            <div className=' w-30 mx-auto my-4'>
+            <div className=' w-50 mx-auto my-4'>
                 <Divider className='fs-5 border-dark-subtle mb-5' orientation="left">Вхід адміністратора</Divider>
                 <Form
                     layout='vertical'
                     style={{
-                        maxWidth: 600,
+                        maxWidth: 300,
                     }}
                     initialValues={{
                         remember: true,
                     }}
                     onFinish={onFinish}
-                    className='mx-auto'
+                    className='mx-auto text-center'
                 >
                     <Form.Item
                         label="Електронна пошта"
@@ -64,7 +64,7 @@ export const Login: React.FC = () => {
                     >
                         <Input.Password type='large' />
                     </Form.Item>
-                    <Button type="primary" htmlType="submit">
+                    <Button className='mt-3' style={{width:200}} type="primary" htmlType="submit">
                         Увійти
                     </Button>
 
