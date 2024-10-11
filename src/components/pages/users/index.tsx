@@ -15,6 +15,7 @@ import { accountService } from "../../../services/accountService";
 import { MessageDialog } from "../../common/message-dialog";
 import { botService } from "../../../services/botService";
 import noImage from "../../../../user.png"
+import { MessageOutlined } from "@ant-design/icons";
 
 
 
@@ -92,13 +93,15 @@ export const Users: React.FC = () => {
                 <Space>
                     <MessageDialog
                         title={`Повідомлення для "${element.userName}"`}
-                        description="Текст повыдомлення"
-                        onSubmit={(message)=>{sendMessage(element.chatId,message)} }
+                        description="Текст повідомлення"
+                        onSubmit={(message) => { sendMessage(element.chatId, message) }}
+                        buttonIcon={<MessageOutlined />}
+                        buttonText=""
                     />
                     <DeleteDialog
                         title={"Ви впевненні?"}
                         description={`Видалити "${element.userName}"?`}
-                        onSubmit={() => deleteUser(element.id,element.chatId)} />
+                        onSubmit={() => deleteUser(element.id, element.chatId)} />
                 </Space>
         },
     ];
@@ -122,14 +125,32 @@ export const Users: React.FC = () => {
         }
     }
 
-    const sendMessage = async (id:number,mess:string)=>{
-        const result =  await botService.sendMessage({chatId:id,message:mess});
+    const sendMessage = async (id: number, mess: string) => {
+        const result = await botService.sendMessage({ chatId: id, message: mess });
         if (result.status == 200) {
-           message.success("Повідомлення відправлено")
+            message.success("Повідомлення відправлено")
         }
     }
 
-    const deleteUser = async (id: number,chatId:number) => {
+    const sendMessageAll = async (mess: string) => {
+        const result = await userService.getAll()
+        if (result.status === 200) {
+            result.data.forEach(async (user: BotUser) => {
+                if (user.chatId) {
+
+                    await botService.sendMessage({ chatId: user.chatId, message: mess });
+                }
+            })
+            if (result.data.filter(x => x.chatId).length > 0) {
+                message.success("Повідомлення відправлені")
+            }
+            else {
+                message.success("Юзери яким можна відправити повідомлення відсутні")
+            }
+        }
+    }
+
+    const deleteUser = async (id: number, chatId: number) => {
         const result = await accountService.delete(id)
         if (result.status == 200) {
             const user = data?.find(x => x.id === id);
@@ -141,7 +162,7 @@ export const Users: React.FC = () => {
             else {
                 await getData();
             }
-            await botService.sendMessage({chatId:chatId,message:"Адміністратор видалив вас з бази даних"})
+            await botService.sendMessage({ chatId: chatId, message: "Адміністратор видалив вас з бази даних" })
         }
     }
 
@@ -149,31 +170,42 @@ export const Users: React.FC = () => {
         setPagination({ ...pagination, page: currentPage, pageSize: pageSize })
     }
     return (
+        <>
+            <div style={{ position: "absolute", right: 20, top: 100 }}>
+                <MessageDialog
+                    title={`Повідомлення всім учасникам`}
+                    description="Текст повідомлення"
+                    onSubmit={(message) => { sendMessageAll(message) }}
+                    buttonIcon={<MessageOutlined />}
+                    buttonText="Надіслати всім"
+                />
+            </div>
+            <div className=' w-75 mx-auto my-4'>
+                <Divider className='fs-5 border-dark-subtle mb-5' orientation="left">Таблиця юзерів</Divider>
+                <Table
+                    columns={columns}
+                    dataSource={data}
+                    rowKey="id"
+                    pagination={false}
+                />
+                {total > 0 &&
+                    <Pagination
+                        align="center"
+                        showSizeChanger
+                        showQuickJumper
+                        pageSizeOptions={paginatorConfig.pagination.pageSizeOptions}
+                        locale={paginatorConfig.pagination.locale}
+                        showTotal={paginatorConfig.pagination.showTotal}
+                        current={pagination.page}
+                        total={total}
+                        pageSize={pagination.pageSize}
+                        onChange={onPaginationChange}
+                        className='mt-4' />
+                }
 
-        <div className=' w-75 mx-auto my-4'>
-            <Divider className='fs-5 border-dark-subtle mb-5' orientation="left">Таблиця юзерів</Divider>
-            <Table
-                columns={columns}
-                dataSource={data}
-                rowKey="id"
-                pagination={false}
-            />
-            {total > 0 &&
-                <Pagination
-                    align="center"
-                    showSizeChanger
-                    showQuickJumper
-                    pageSizeOptions={paginatorConfig.pagination.pageSizeOptions}
-                    locale={paginatorConfig.pagination.locale}
-                    showTotal={paginatorConfig.pagination.showTotal}
-                    current={pagination.page}
-                    total={total}
-                    pageSize={pagination.pageSize}
-                    onChange={onPaginationChange}
-                    className='mt-4' />
-            }
+            </div>
+        </>
 
-        </div>
 
     )
 }
