@@ -10,10 +10,10 @@ interface Props {
 }
 export const MessageDialog: React.FC<Props> = ({ title, description, onSubmit}) => {
     const [open, setOpen] = useState(false);
-    const [message,setMessage] = useState<string>('');
+    const [message,setMessage] = useState<string>('Адмін: ');
     const handleCancel = () => {
         setOpen(false);
-        setMessage('')
+        setMessage('Адмін: ')
     };
    
 

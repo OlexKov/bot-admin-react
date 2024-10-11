@@ -25,7 +25,7 @@ export const Users: React.FC = () => {
     const navigate = useNavigate();
     useEffect(() => {
         if (!user) {
-            navigate('/Login')
+            navigate('/login')
         }
     }, [user])
 
@@ -98,7 +98,7 @@ export const Users: React.FC = () => {
                     <DeleteDialog
                         title={"Ви впевненні?"}
                         description={`Видалити "${element.userName}"?`}
-                        onSubmit={() => deleteUser(element.id)} />
+                        onSubmit={() => deleteUser(element.id,element.chatId)} />
                 </Space>
         },
     ];
@@ -129,7 +129,7 @@ export const Users: React.FC = () => {
         }
     }
 
-    const deleteUser = async (id: number) => {
+    const deleteUser = async (id: number,chatId:number) => {
         const result = await accountService.delete(id)
         if (result.status == 200) {
             const user = data?.find(x => x.id === id);
@@ -141,6 +141,7 @@ export const Users: React.FC = () => {
             else {
                 await getData();
             }
+            await botService.sendMessage({chatId:chatId,message:"Адміністратор видалив вас з бази даних"})
         }
     }
 

@@ -23,7 +23,6 @@ export const getDataFromJwtToken = (token: string | undefined | null): User | un
     }
   }
   return undefined;
-
 }
 
 export const getQueryString = (filter: any): string => {
