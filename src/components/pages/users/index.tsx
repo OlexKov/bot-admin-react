@@ -3,7 +3,7 @@ import { User } from "../../../models/User"
 import { RootState } from "../../../store";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Avatar, Button, Divider, Pagination, Space, Table, TableProps } from "antd";
+import { Avatar, Divider, message, Pagination, Space, Table, TableProps } from "antd";
 import { APP_ENV } from "../../../env";
 import { BotUser } from "../../../models/BotUser";
 import { PagintionData } from "../../../models/PaginationData";
@@ -11,7 +11,10 @@ import { paginatorConfig } from "../../../helpers/constants";
 import { userService } from "../../../services/userService";
 import { getQueryString } from "../../../helpers/common-methods";
 import { DeleteDialog } from "../../common/delete-dialog";
-import { MessageOutlined } from "@ant-design/icons";
+import { accountService } from "../../../services/accountService";
+import { MessageDialog } from "../../common/message-dialog";
+import { botService } from "../../../services/botService";
+import noImage from "../../../../user.png"
 
 
 
@@ -45,7 +48,7 @@ export const Users: React.FC = () => {
             title: 'Фото',
             dataIndex: 'image',
             key: 'image',
-            render: (element: string) => <Avatar size={32} src={`${imageFolder}/200_${element}`} />
+            render: (element: string) => <Avatar size={48} src={element ? `${imageFolder}/200_${element}` : noImage} />
         },
         {
             title: 'Юзер',
@@ -87,10 +90,15 @@ export const Users: React.FC = () => {
             render: (element: BotUser) =>
                 element.chatId > 0 &&
                 <Space>
-                    <Button icon={<MessageOutlined />} onClick={() => navigate(`create?id=${element.id}`)} type='primary' />
-                    <DeleteDialog title={"Ви впевненні?"}
+                    <MessageDialog
+                        title={`Повідомлення для "${element.userName}"`}
+                        description="Текст повыдомлення"
+                        onSubmit={(message)=>{sendMessage(element.chatId,message)} }
+                    />
+                    <DeleteDialog
+                        title={"Ви впевненні?"}
                         description={`Видалити "${element.userName}"?`}
-                        onSubmit={() => deleteCategory(element.id)} />
+                        onSubmit={() => deleteUser(element.id)} />
                 </Space>
         },
     ];
@@ -114,19 +122,26 @@ export const Users: React.FC = () => {
         }
     }
 
-    const deleteCategory = async (id: number) => {
-        // const result = await categoryService.delete(id)
-        // if (result.status == 200) {
-        //     const category = data?.find(x => x.id === id);
-        //     message.success(`Category "${category?.name}" successfully deleted`)
-        //     if (data?.length === 1 && pagination.page > 1) {
-        //         const newPage = pagination.page - 1;
-        //         setPagination({ ...pagination, page: newPage })
-        //     }
-        //     else {
-        //         await getData();
-        //     }
-        // }
+    const sendMessage = async (id:number,mess:string)=>{
+        const result =  await botService.sendMessage({chatId:id,message:mess});
+        if (result.status == 200) {
+           message.success("Повідомлення відправлено")
+        }
+    }
+
+    const deleteUser = async (id: number) => {
+        const result = await accountService.delete(id)
+        if (result.status == 200) {
+            const user = data?.find(x => x.id === id);
+            message.success(`Користувача"${user?.userName}" видалено`)
+            if (data?.length === 1 && pagination.page > 1) {
+                const newPage = pagination.page - 1;
+                setPagination({ ...pagination, page: newPage })
+            }
+            else {
+                await getData();
+            }
+        }
     }
 
     const onPaginationChange = (currentPage: number, pageSize: number) => {

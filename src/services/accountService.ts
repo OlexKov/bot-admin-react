@@ -7,5 +7,5 @@ import { LoginResponse } from "../models/LoginResponse";
 const accountsAPIUrl = APP_ENV.ACCOUNT_API_URL;
 export const accountService = {
     login: (model:LoginRequest) => TryError<LoginResponse>(()=>  axios.post<LoginResponse>(accountsAPIUrl + '/login', model)),
-   // register:(user:UserRegisterModel)=> TryError(()=> axios.post(accountsAPIUrl + '/sign-up', user,formPostConfig)),
+    delete:(userId:number)=> TryError(()=> axios.delete(accountsAPIUrl + `/delete/${userId}`))
 }
